@@ -18,6 +18,7 @@ import (
     "log"
     "os"
     "flag"
+    "strings"
 )
 
 var help, bar bool
@@ -46,6 +47,10 @@ func main() {
     }
 
     stringOfDigits := flag.Arg(0)
+    barlength := getbarlength(stringOfDigits)
+    if bar {
+        fmt.Println(strings.Repeat("*", barlength))
+    }
     for row := range bigDigits[0] {
         line := ""
         for column := range stringOfDigits {
@@ -58,11 +63,33 @@ func main() {
         }
         fmt.Println(line)
     }
+    if bar {
+        fmt.Println(strings.Repeat("*", barlength))
+    }
 }
 
 func usage() {
     fmt.Println("usage: bigdigits [-b|--bar] whole-number")
     fmt.Println("-b --bar draw an underbar and an overbar")
+}
+
+func getbarlength(stringOfDigits string) int {
+    var length int
+    for column := range stringOfDigits {
+        var maxwidth int
+        digit := stringOfDigits[column] - '0'
+        if 0 <= digit && digit <= 9 {
+            for row := range bigDigits[digit] {
+                if len(bigDigits[digit][row]) > maxwidth {
+                    maxwidth = len(bigDigits[digit][row])
+                }
+            }
+        } else {
+            log.Fatal("invalid whole number")
+        }
+        length += (maxwidth + 2)
+    }
+    return (length - 2)
 }
 
 var bigDigits = [][]string{
